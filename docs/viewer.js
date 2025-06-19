@@ -7,6 +7,8 @@ document.addEventListener('DOMContentLoaded', function () {
   const goToPageBtn = document.getElementById('go-to-page-btn');
   const zoomOutBtn = document.getElementById('zoom-out');
   const zoomInBtn = document.getElementById('zoom-in');
+  const fileInput = document.getElementById('file-input');
+  const loadBtn = document.getElementById('load-btn');
 
   let pdfDoc = null;
   let pageNum = 1;
@@ -47,6 +49,15 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
+  function loadFile() {
+    const file = fileInput.files[0];
+    if (file) {
+      const fileURL = URL.createObjectURL(file);
+      loadPDF(fileURL);
+    }
+  }
+
+  // Event listeners
   prevPageBtn.addEventListener('click', () => {
     if (pageNum <= 1) return;
     pageNum--;
@@ -80,5 +91,9 @@ document.addEventListener('DOMContentLoaded', function () {
       renderPage(pageNum);
     }
   });
+
+  loadBtn.addEventListener('click', loadFile);
+
+  // Load default PDF
   loadPDF('DairyFarm.pdf');
 });
