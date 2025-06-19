@@ -14,6 +14,16 @@ h1 {
   color: #2c3e50;
 }
 
+#file-controls {
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto 20px auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
 #pdf-container {
   background: #fff;
   border: 1px solid #e0e0e0;
