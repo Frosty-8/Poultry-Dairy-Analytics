@@ -317,12 +317,10 @@
     </style>
 </head>
 <body>
-    <header class="animate">
-        <div class="container">
-            <h1>Frosty-8 Poultry & Dairy Analytics</h1>
-            <p class="subtitle">A comprehensive analytics solution for poultry health monitoring and dairy farm management using machine learning</p>
-            <a href="pdf-viewer.html" class="pdf-viewer-btn">View Dairy Farm PDF Reports</a>
-        </div>
+    <header>
+        <h1>Frosty-8 Poultry & Dairy Analytics</h1>
+        <p class="subtitle">A comprehensive analytics solution for poultry health monitoring and dairy farm management using machine learning</p>
+        <a href="pdf-viewer.html" class="pdf-viewer-btn">View Dairy Farm PDF Reports</a>
     </header>
 
     <div class="container">
@@ -338,22 +336,144 @@
             <p>The system analyzes various poultry health parameters like mortality rates, feed consumption, environmental conditions, and predicts potential disease outbreaks with 98.6% accuracy.</p>
         </section>
 
-        <section class="animate delay-1">
+        <section class="project-info animate delay-1">
+            <h2>Project Goal and Problem Statement</h2>
+            <p><strong>Goal:</strong> To develop a predictive analytics solution to identify potential disease outbreaks in poultry flocks early, enabling proactive intervention and minimizing economic losses.</p>
+            <p><strong>Problem:</strong> Disease outbreaks in poultry farms can lead to significant mortality rates, reduced productivity, increased veterinary costs, and substantial financial losses. Traditional methods of detecting outbreaks often rely on manual observation or post-facto analysis, which can delay intervention and exacerbate the impact. This project aims to provide an early warning system using machine learning to mitigate these risks.</p>
+        </section>
+
+        <section class="project-info animate delay-2">
+            <h2>Dataset Overview</h2>
+            <p><strong>Data Source:</strong> <code>poultry_health_data.csv</code> (simulated data)</p>
+            <h3>Key Features (Input Data):</h3>
+            <ul>
+                <li><code>date</code>: The specific date of the observation.</li>
+                <li><code>flock_id</code>: Unique identifier for each poultry flock.</li>
+                <li><code>day_of_flock_cycle</code>: The current day in the flock's life cycle.</li>
+                <li><code>number_of_birds_start</code>: Initial number of birds in the flock.</li>
+                <li><code>daily_mortality</code>: Number of birds that died on a given day.</li>
+                <li><code>avg_weight_g</code>: Average weight of birds in the flock (in grams).</li>
+                <li><code>feed_consumption_kg</code>: Total feed consumed by the flock (in kilograms).</li>
+                <li><code>water_consumption_liters</code>: Total water consumed by the flock (in liters).</li>
+                <li><code>shed_temperature_c</code>: Average temperature in the poultry shed (in Celsius).</li>
+                <li><code>shed_humidity_percent</code>: Average humidity in the poultry shed (in percentage).</li>
+                <li><code>ammonia_level_ppm</code>: Ammonia levels in the shed (in parts per million).</li>
+            </ul>
+            <h3>Target Variable (Output Prediction):</h3>
+            <ul>
+                <li><code>disease_outbreak</code>: A binary indicator (0 for no outbreak, 1 for an outbreak).</li>
+                <li><code>symptoms_observed</code>: Details on symptoms if an outbreak occurred (informational).</li>
+            </ul>
+        </section>
+
+        <section class="project-info animate delay-3">
+            <h2>Methodology and Model Selection</h2>
+            <p><strong>Task Type:</strong> Binary Classification (predicting <code>disease_outbreak</code>).</p>
+            <p><strong>Approach:</strong> Given the sequential nature of daily farm records, Recurrent Neural Networks (RNNs) are chosen to capture temporal dependencies and patterns over time.</p>
+            <p><strong>Primary Model:</strong></p>
+            <ul>
+                <li><strong>Long Short-Term Memory (LSTM) Network:</strong> A powerful type of RNN specifically designed to handle long-term dependencies and overcome the vanishing gradient problem inherent in traditional RNNs. This allows the model to learn from trends and changes in various metrics over several days or weeks leading up to a potential outbreak.</li>
+            </ul>
+            <p><strong>Alternative/Considered Models:</strong></p>
+            <ul>
+                <li><strong>Gradient Boosting Machines (XGBoost, LightGBM):</strong> Strong baselines for tabular data, capable of high accuracy and providing feature importance insights.</li>
+                <li><strong>Random Forest:</strong> Another robust ensemble method for classification.</li>
+                <li><strong>Logistic Regression:</strong> A simple, interpretable baseline model.</li>
+            </ul>
+        </section>
+
+        <section class="project-info animate">
+            <h2>Key Steps in the Machine Learning Pipeline</h2>
+            <ol>
+                <li><strong>Data Loading and Preparation:</strong>
+                    <ul>
+                        <li>Reading the <code>poultry_health_data.csv</code> file.</li>
+                        <li>Converting <code>date</code> column to datetime objects and sorting data by <code>flock_id</code> and <code>date</code>.</li>
+                        <li><strong>Feature Scaling:</strong> Normalizing numerical features (e.g., using <code>MinMaxScaler</code>) to a common range (0 to 1) for optimal neural network performance.</li>
+                        <li><strong>Sequence Generation:</strong> Transforming the tabular data into sequences. For each <code>flock_id</code>, fixed-length look-back windows (e.g., 7 days of features) are created as input (<code>X</code>), with the <code>disease_outbreak</code> status for a subsequent day (e.g., the 8th day) as the target (<code>y</code>).</li>
+                        <li><strong>Data Splitting:</strong> Dividing the sequences into training and testing sets (e.g., 80% training, 20% testing). Stratified splitting is used if the <code>disease_outbreak</code> class is imbalanced.</li>
+                    </ul>
+                </li>
+                <li><strong>Model Architecture (TensorFlow/Keras):</strong>
+                    <ul>
+                        <li>A Sequential Keras model is constructed.</li>
+                        <li>Typically includes one or more <code>LSTM</code> layers to process the time-series data.</li>
+                        <li><code>Dropout</code> layers are added to prevent overfitting.</li>
+                        <li><code>Dense</code> (fully connected) layers follow the LSTM layers, leading to a final output layer.</li>
+                        <li>The output layer uses a <code>sigmoid</code> activation function for binary classification (predicting the probability of an outbreak).</li>
+                    </ul>
+                </li>
+                <li><strong>Model Training:</strong>
+                    <ul>
+                        <li>The model is compiled with an <code>adam</code> optimizer and <code>binary_crossentropy</code> loss function (suitable for binary classification).</li>
+                        <li>Trained on the <code>X_train</code> and <code>y_train</code> data for a specified number of <code>epochs</code> with a defined <code>batch_size</code>.</li>
+                        <li><strong>Early Stopping:</strong> A callback is used to monitor <code>val_loss</code> and stop training if validation loss doesn't improve for a certain number of epochs (<code>patience</code>), restoring the best weights to prevent overfitting.</li>
+                    </ul>
+                </li>
+                <li><strong>Model Evaluation:</strong>
+                    <ul>
+                        <li>The trained model's performance is evaluated on the unseen <code>X_test</code> and <code>y_test</code> data.</li>
+                        <li><strong>Metrics:</strong> Beyond basic <code>accuracy</code>, critical metrics for imbalanced classification (like disease prediction) include:
+                            <ul>
+                                <li><strong>Confusion Matrix:</strong> Provides counts of True Positives, True Negatives, False Positives, and False Negatives.</li>
+                                <li><strong>Precision:</strong> Of all predicted outbreaks, how many were correct.</li>
+                                <li><strong>Recall (Sensitivity):</strong> Of all actual outbreaks, how many were correctly detected (crucial for early warning).</li>
+                                <li><strong>F1-Score:</strong> Harmonic mean of precision and recall.</li>
+                                <li><strong>ROC AUC Score:</strong> Measures the model's ability to distinguish between outbreak and non-outbreak classes across various thresholds.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ol>
+        </section>
+
+        <section class="project-info animate delay-1">
+            <h2>Output and Predictions</h2>
+            <p>The model outputs a probability (between 0 and 1) for a disease outbreak. This probability is then converted into a binary prediction (0 or 1) using a threshold (typically 0.5, but adjustable based on desired precision-recall trade-offs).</p>
+        </section>
+
+        <section class="project-info animate delay-2">
+            <h2>Key Visualizations for Insights</h2>
+            <ul>
+                <li><strong>Confusion Matrix Heatmap:</strong> To clearly show the number of correct predictions, false alarms, and missed outbreaks.</li>
+                <li><strong>ROC Curve:</strong> To assess the model's discriminative power.</li>
+                <li><strong>Precision-Recall Curve:</strong> Essential for understanding the trade-off between false alarms and missed detections, particularly for rare outbreak events.</li>
+                <li><strong>Accuracy/Loss Over Epochs:</strong> To monitor training progress and diagnose overfitting/underfitting.</li>
+                <li><strong>Predicted Outbreak Probability Trend per Flock:</strong> A line chart visualizing the model's estimated risk of an outbreak for each flock over time, allowing managers to identify rising risk.</li>
+                <li><strong>Actual vs. Predicted Outbreak Events Timeline:</strong> A scatter plot or timeline showing when actual outbreaks occurred versus when the model predicted them, to assess the timeliness and correctness of alerts.</li>
+            </ul>
+        </section>
+
+        <section class="project-info animate delay-3">
+            <h2>Potential Impact and Use Cases</h2>
+            <ul>
+                <li><strong>Early Warning System:</strong> Provides proactive alerts for potential disease outbreaks, enabling timely intervention.</li>
+                <li><strong>Reduced Economic Losses:</strong> By preventing or mitigating the spread of disease, the system can reduce mortality rates and associated financial impact.</li>
+                <li><strong>Optimized Resource Allocation:</strong> Farm managers can prioritize attention and resources (e.g., veterinary visits, medication) to high-risk flocks.</li>
+                <li><strong>Data-Driven Decision Making:</strong> Moves from reactive responses to predictive, evidence-based farm management.</li>
+                <li><strong>Improved Animal Welfare:</strong> Healthier flocks due to early detection and intervention.</li>
+                <li><strong>Enhanced Farm Efficiency:</strong> Streamlines monitoring and decision processes related to flock health.</li>
+            </ul>
+        </section>
+
+        <section class="project-info animate">
             <h2>Project Structure</h2>
             <div class="file-structure">
-                <pre>frosty-8-poultry-dairy-analytics/
-├── <span class="directory">README.md</span>                # Project documentation
-├── <span class="directory">codes.ipynb</span>              # Jupyter notebook with model code
-├── <span class="directory">DairyFarm.pbix</span>           # Power BI dashboard for dairy analytics
-├── <span class="directory">poultry_health_data.joblib</span> # Serialized trained model
-├── <span class="directory">pyproject.toml</span>           # Python project configuration
-├── <span class="directory">uv.lock</span>                  # Dependency lock file
-├── <span class="directory">.python-version</span>          # Python version specification
-└── <span class="directory">docs/</span>                    # Documentation files</pre>
+                <pre>
+<span class="directory">frosty-8-poultry-dairy-analytics/</span>
+├── <span class="file-name">README.md</span>                # Project documentation
+├── <span class="file-name">codes.ipynb</span>              # Jupyter notebook with model code
+├── <span class="file-name">DairyFarm.pbix</span>           # Power BI dashboard for dairy analytics
+├── <span class="file-name">poultry_health_data.joblib</span> # Serialized trained model
+├── <span class="file-name">pyproject.toml</span>           # Python project configuration
+├── <span class="file-name">uv.lock</span>                  # Dependency lock file
+├── <span class="file-name">.python-version</span>          # Python version
+└── <span class="directory">docs/</span>                    # Documentation files
+                </pre>
             </div>
         </section>
 
-        <section class="animate delay-2">
+        <section class="project-info animate delay-1">
             <h2>Key Features</h2>
             <div class="features">
                 <div class="feature-card">
@@ -371,128 +491,102 @@
             </div>
         </section>
 
-        <section class="animate delay-3">
+        <section>
             <h2>Technical Implementation</h2>
-            <h3>Model Architecture</h3>
-            <p>The poultry health prediction model uses a Bidirectional LSTM architecture with dropout layers for regularization:</p>
-            
-            <div class="code-block">
-                <button class="copy-btn">Copy Code</button>
-                <pre><span class="keyword">model_bi</span> = <span class="function">Sequential</span>([
-    <span class="function">Bidirectional</span>(<span class="function">LSTM</span>(units=50, return_sequences=True), input_shape=(X_train.shape[1], X_train.shape[2])),
-    <span class="function">Dropout</span>(0.2),
-    <span class="function">Bidirectional</span>(<span class="function">LSTM</span>(units=100)),
-    <span class="function">Dropout</span>(0.2),
-    <span class="function">Dense</span>(units=64, activation=<span class="string">'relu'</span>),
-    <span class="function">Dropout</span>(0.2),
-    <span class="function">Dense</span>(units=1, activation=<span class="string">'sigmoid'</span>)
-])</pre>
+            <div class="project-info animate delay-2">
+                <h3>Model Architecture</h3>
+                <p>The poultry health prediction model uses a Bidirectional LSTM architecture with dropout layers for regularization:</p>
+                <div class="code-block">
+                    <button class="copy-btn">Copy Code</button>
+                    <pre>
+<span class="function">model_bi</span> = <span class="function">Sequential</span><span class="punctuation">([</span>
+    <span class="function">Bidirectional</span><span class="punctuation">(</span><span class="function">LSTM</span><span class="punctuation">(</span>units=<span class="number">50</span>, return_sequences=<span class="builtin">True</span><span class="punctuation">)),</span> input_shape=<span class="punctuation">(</span>X_train.shape<span class="punctuation">[1],</span> X_train.shape<span class="punctuation">[2]))</span><span class="punctuation">,</span>
+    <span class="function">Dropout</span><span class="punctuation">(</span><span class="number">0.2</span><span class="punctuation">),</span>
+    <span class="function">Bidirectional</span><span class="punctuation">(</span><span class="function">LSTM</span><span class="punctuation">(</span>units=<span class="number">100</span><span class="punctuation">)),</span>
+    <span class="function">Dropout</span><span class="punctuation">(</span><span class="number">0.2</span><span class="punctuation">),</span>
+    <span class="function">Dense</span><span class="punctuation">(</span>units=<span class="number">64</span>, activation=<span class="string">'relu'</span><span class="punctuation">),</span>
+    <span class="function">Dropout</span><span class="punctuation">(</span><span class="number">0.2</span><span class="punctuation">),</span>
+    <span class="function">Dense</span><span class="punctuation">(</span>units=<span class="number">1</span>, activation=<span class="string">'sigmoid'</span><span class="punctuation">))</span>
+<span class="punctuation">])</span>
+                    </pre>
+                </div>
             </div>
 
-            <h3>Data Preprocessing</h3>
-            <p>The data is normalized and transformed into sequences for the LSTM model:</p>
-            
-            <div class="code-block">
-                <button class="copy-btn">Copy Code</button>
-                <pre><span class="comment"># Normalize features</span>
-<span class="keyword">scaler</span> = <span class="function">MinMaxScaler</span>(feature_range=(0,1))
-df[features] = <span class="keyword">scaler</span>.fit_transform(df[features])
+            <div class="project-info">
+                <h3>Data Preprocessing</h3>
+                <p>The data is normalized and transformed into sequences for the LSTM model:</p>
+                <div class="code-block">
+                    <button class="copy-btn">Copy Code</button>
+                    <pre>
+<span class="comment"># Normalize features</span>
+<span class="function">scaler</span> = <span class="function">MinMaxScaler</span><span class="punctuation">(</span>feature_range=<span class="punctuation">(</span><span class="number">0</span>,<span class="number">1</span><span class="punctuation">))</span>
+df[<span class="variable">features</span>] = scaler<span class="punctuation">.</span><span class="method">fit_transform</span><span class="punctuation">(</span>df[<span class="variable">features</span>]<span class="punctuation">)</span>
 
 <span class="comment"># Create sequences</span>
-<span class="keyword">sequences</span> = []
-<span class="keyword">labels</span> = []
-<span class="keyword">look_back</span> = 14
+<span class="variable">sequences</span> = <span class="punctuation">[]</span>
+<span class="variable">labels</span> = <span class="punctuation">[]</span>
+<span class="variable">look_back</span> = <span class="number">14</span>
 
-<span class="keyword">for</span> flock_id <span class="keyword">in</span> df[<span class="string">'flock_id'</span>].unique():
-    <span class="keyword">flock_df</span> = df[df[<span class="string">'flock_id'</span>]== flock_id].copy()
+<span class="keyword">for</span> <span class="variable">flock_id</span> <span class="keyword">in</span> df[<span class="string">'flock_id'</span>]<span class="punctuation">.</span><span class="method">unique</span><span class="punctuation">():</span>
+    <span class="variable">flock_df</span> = df[<span class="punctuation">(</span>df[<span class="string">'flock_id'</span>]<span class="operator">==</span> flock_id<span class="punctuation">)]</span>.<span class="method">copy</span><span class="punctuation">()</span>
     
-    <span class="keyword">if</span> len(flock_df) > look_back:
-        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(flock_df) - look_back):
-            <span class="keyword">seq_x</span> = flock_df[features].iloc[i:i + look_back].values
-            <span class="keyword">seq_y</span> = flock_df[target].iloc[i + look_back]
-            sequences.append(seq_x)
-            labels.append(seq_y)</pre>
+    <span class="keyword">if</span> <span class="function">len</span><span class="punctuation">(</span><span class="variable">flock_df</span><span class="punctuation">) > </span><span class="variable">look_back</span><span class="punctuation">:</span>
+        <span class="keyword">for</span> <span class="variable">i</span> <span class="keyword">in</span> <span class="function">range</span><span class="punctuation">(</span><span class="function">len</span><span class="punctuation">(</span><span class="variable">flock_df</span><span class="punctuation">) - </span><span class="variable">look_back</span><span class="punctuation">):</span>
+            <span class="variable">seq_x</span> = <span class="variable">flock_df</span>[<span class="variable">features</span>]<span class="punctuation">.</span><span class="method">iloc</span>[i:i + <span class="variable">look_back</span>]<span class="punctuation">.</span><span class="method">values</span>
+            <span class="variable">seq_y</span> = <span class="variable">flock_df</span>[<span class="variable">target</span>]<span class="punctuation">.</span><span class="method">iloc</span>[i + <span class="variable">look_back</span>]
+            <span class="variable">sequences</span><span class="punctuation">.</span><span class="method">append</span><span class="punctuation">(</span><span class="variable">seq_x</span><span class="punctuation">)</span>
+            <span class="variable">labels</span><span class="punctuation">.</span><span class="method">append</span><span class="punctuation">(</span><span class="variable">seq_y</span><span class="punctuation">)</span>
+                    </pre>
+                </div>
             </div>
         </section>
 
-        <section class="tech-stack animate">
+        <section class="project-info animate">
             <h2>Technology Stack</h2>
-            <div class="tech-list">
-                <div class="tech-item">Python</div>
-                <div class="tech-item">TensorFlow</div>
-                <div class="tech-item">Keras</div>
-                <div class="tech-item">Pandas</div>
-                <div class="tech-item">NumPy</div>
-                <div class="tech-item">scikit-learn</div>
-                <div class="tech-item">Jupyter</div>
-                <div class="tech-item">Power BI</div>
-                <div class="tech-item">Joblib</div>
+            <div class="tech-stack">
+                <div class="tech-list">
+                    <span class="tech-item">Python</span>
+                    <span class="tech-item">TensorFlow</span>
+                    <span class="tech-item">Keras</span>
+                    <span class="tech-item">Pandas</span>
+                    <span class="tech-item">NumPy</span>
+                    <span class="tech-item">scikit-learn</span>
+                    <span class="tech-item">Jupyter</span>
+                    <span class="tech-item">Power BI</span>
+                    <span class="tech-item">Joblib</span>
+                </div>
             </div>
         </section>
 
-        <section class="animate">
+        <section class="project-info animate delay-1">
             <h2>Model Performance</h2>
             <p>The trained model achieves excellent performance on the test set:</p>
             <div class="code-block">
                 <button class="copy-btn">Copy Code</button>
-                <pre>Test Loss: 0.0741
-Test Accuracy: 98.6111%</pre>
+                <pre>
+Test Loss: <span class="number">0.0741</span>
+Test Accuracy: <span class="number">98.6111%</span>
+                </pre>
             </div>
-            
+
             <h3>Sample Predictions</h3>
             <div class="code-block">
                 <button class="copy-btn">Copy Code</button>
-                <pre>Actual: 0, Predicted Probability: 0.0096, Predicted Class: 0
-Actual: 0, Predicted Probability: 0.0115, Predicted Class: 0
-Actual: 0, Predicted Probability: 0.0100, Predicted Class: 0
-Actual: 0, Predicted Probability: 0.0089, Predicted Class: 0
-Actual: 0, Predicted Probability: 0.0090, Predicted Class: 0</pre>
+                <pre>
+Actual: <span class="number">0</span>, Predicted Probability: <span class="number">0.0096</span>, Predicted Class: <span class="number">0</span>
+Actual: <span class="number">0</span>, Predicted Probability: <span class="number">0.0115</span>, Predicted Class: <span class="number">0</span>
+Actual: <span class="number">0</span>, Predicted Probability: <span class="number">0.0100</span>, Predicted Class: <span class="number">0</span>
+Actual: <span class="number">0</span>, Predicted Probability: <span class="number">0.0089</span>, Predicted Class: <span class="number">0</span>
+Actual: <span class="number">0</span>, Predicted Probability: <span class="number">0.0090</span>, Predicted Class: <span class="number">0</span>
+                </pre>
             </div>
         </section>
     </div>
 
-    <footer class="animate delay-3">
-        <div class="container">
-            <p>Frosty-8 Poultry & Dairy Analytics Project</p>
-            <p>© 2024 All Rights Reserved</p>
-        </div>
+    <footer>
+        <p>Frosty-8 Poultry & Dairy Analytics Project</p>
+        <p>© 2025 All Rights Reserved</p>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Copy button functionality
-            const copyButtons = document.querySelectorAll('.copy-btn');
-            
-            copyButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const codeBlock = this.parentElement;
-                    const code = codeBlock.querySelector('pre').textContent;
-                    
-                    navigator.clipboard.writeText(code).then(() => {
-                        this.textContent = 'Copied!';
-                        this.classList.add('copied');
-                        
-                        setTimeout(() => {
-                            this.textContent = 'Copy Code';
-                            this.classList.remove('copied');
-                        }, 2000);
-                    });
-                });
-            });
-
-            // Intersection Observer for animations
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate');
-                    }
-                });
-            }, { threshold: 0.1 });
-
-            document.querySelectorAll('section').forEach(section => {
-                observer.observe(section);
-            });
-        });
-    </script>
 </body>
 </html>
