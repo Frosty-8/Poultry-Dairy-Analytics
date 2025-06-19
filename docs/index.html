@@ -1,31 +1,476 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Dairy Farm PDF Viewer</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Frosty-8 Poultry & Dairy Analytics</title>
+    <style>
+        :root {
+            --primary: #7c3aed;
+            --secondary: #10b981;
+            --dark: #1e293b;
+            --darker: #0f172a;
+            --light: #f8fafc;
+            --gray: #94a3b8;
+            --code-bg: #334155;
+            --card-bg: #1e293b;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--darker);
+            color: var(--light);
+            line-height: 1.6;
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark), var(--darker));
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            color: var(--gray);
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .project-info {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            border-left: 4px solid var(--primary);
+        }
+
+        .project-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        h2::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--secondary);
+            transition: var(--transition);
+        }
+
+        h2:hover::after {
+            width: 100%;
+        }
+
+        h3 {
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem;
+            font-size: 1.4rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            color: var(--gray);
+        }
+
+        ul, ol {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+
+        li {
+            margin-bottom: 0.5rem;
+            color: var(--gray);
+        }
+
+        .file-structure {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .file-structure pre {
+            margin: 0;
+            white-space: pre;
+        }
+
+        .file-name {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+
+        .directory {
+            color: var(--primary);
+        }
+
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            color: #e2e8f0;
+            line-height: 1.5;
+            tab-size: 4;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            opacity: 0;
+        }
+
+        .code-block:hover .copy-btn {
+            opacity: 1;
+        }
+
+        .copy-btn:hover {
+            background-color: #6d28d9;
+        }
+
+        .copy-btn.copied {
+            background-color: var(--secondary);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature-card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 1.5rem;
+            transition: var(--transition);
+            border-top: 3px solid var(--primary);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature-card h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+
+        .tech-stack {
+            margin: 2rem 0;
+        }
+
+        .tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .tech-item {
+            background-color: rgba(124, 58, 237, 0.1);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            transition: var(--transition);
+        }
+
+        .tech-item:hover {
+            background-color: rgba(124, 58, 237, 0.2);
+            transform: scale(1.05);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+        }
+
+        /* Syntax highlighting */
+        .keyword { color: #f472b6; }
+        .string { color: #86efac; }
+        .comment { color: #64748b; font-style: italic; }
+        .function { color: #7dd3fc; }
+        .number { color: #f59e0b; }
+        .operator { color: #93c5fd; }
+        .punctuation { color: #cbd5e1; }
+        .builtin { color: #fca5a5; }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+    </style>
 </head>
 <body>
-  <h1>Dairy Farm PDF Viewer</h1>
-  
-  <div id="pdf-container"></div>
-  
-  <div id="page-controls">
-    <button id="prev-page">Previous</button>
-    <span id="page-num">Page 1</span>
-    <button id="next-page">Next</button>
-    <input type="number" id="go-to-page-input" placeholder="Go to Page" min="1" />
-    <button id="go-to-page-btn">Go</button>
-  </div>
-  
-  <div id="zoom-controls">
-    <button id="zoom-out">Zoom Out</button>
-    <button id="zoom-in">Zoom In</button>
-  </div>
-  
-  <!-- PDF.js library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
-  <script src="viewer.js"></script>
+    <header class="animate">
+        <div class="container">
+            <h1>Frosty-8 Poultry & Dairy Analytics</h1>
+            <p class="subtitle">A comprehensive analytics solution for poultry health monitoring and dairy farm management using machine learning</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <section class="project-info animate">
+            <h2>Project Overview</h2>
+            <p>This project provides a complete analytics pipeline for poultry health monitoring and dairy farm management. It includes:</p>
+            <ul>
+                <li>A Bidirectional LSTM model for predicting disease outbreaks in poultry farms</li>
+                <li>Data preprocessing and feature engineering pipelines</li>
+                <li>Interactive Power BI dashboards for dairy farm analytics</li>
+                <li>Jupyter notebooks for model development and experimentation</li>
+            </ul>
+            <p>The system analyzes various poultry health parameters like mortality rates, feed consumption, environmental conditions, and predicts potential disease outbreaks with 98.6% accuracy.</p>
+        </section>
+
+        <section class="animate delay-1">
+            <h2>Project Structure</h2>
+            <div class="file-structure">
+                <pre>frosty-8-poultry-dairy-analytics/
+├── <span class="directory">README.md</span>                # Project documentation
+├── <span class="directory">codes.ipynb</span>              # Jupyter notebook with model code
+├── <span class="directory">DairyFarm.pbix</span>           # Power BI dashboard for dairy analytics
+├── <span class="directory">poultry_health_data.joblib</span> # Serialized trained model
+├── <span class="directory">pyproject.toml</span>           # Python project configuration
+├── <span class="directory">uv.lock</span>                  # Dependency lock file
+├── <span class="directory">.python-version</span>          # Python version specification
+└── <span class="directory">docs/</span>                    # Documentation files</pre>
+            </div>
+        </section>
+
+        <section class="animate delay-2">
+            <h2>Key Features</h2>
+            <div class="features">
+                <div class="feature-card">
+                    <h3>Disease Prediction</h3>
+                    <p>Predicts poultry disease outbreaks with 98.6% accuracy using a Bidirectional LSTM model trained on historical farm data.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Real-time Monitoring</h3>
+                    <p>Analyzes key metrics like daily mortality, feed consumption, water usage, and environmental conditions in real-time.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>Interactive Dashboards</h3>
+                    <p>Power BI dashboards provide visual insights into dairy farm operations and performance metrics.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="animate delay-3">
+            <h2>Technical Implementation</h2>
+            <h3>Model Architecture</h3>
+            <p>The poultry health prediction model uses a Bidirectional LSTM architecture with dropout layers for regularization:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn">Copy Code</button>
+                <pre><span class="keyword">model_bi</span> = <span class="function">Sequential</span>([
+    <span class="function">Bidirectional</span>(<span class="function">LSTM</span>(units=50, return_sequences=True), input_shape=(X_train.shape[1], X_train.shape[2])),
+    <span class="function">Dropout</span>(0.2),
+    <span class="function">Bidirectional</span>(<span class="function">LSTM</span>(units=100)),
+    <span class="function">Dropout</span>(0.2),
+    <span class="function">Dense</span>(units=64, activation=<span class="string">'relu'</span>),
+    <span class="function">Dropout</span>(0.2),
+    <span class="function">Dense</span>(units=1, activation=<span class="string">'sigmoid'</span>)
+])</pre>
+            </div>
+
+            <h3>Data Preprocessing</h3>
+            <p>The data is normalized and transformed into sequences for the LSTM model:</p>
+            
+            <div class="code-block">
+                <button class="copy-btn">Copy Code</button>
+                <pre><span class="comment"># Normalize features</span>
+<span class="keyword">scaler</span> = <span class="function">MinMaxScaler</span>(feature_range=(0,1))
+df[features] = <span class="keyword">scaler</span>.fit_transform(df[features])
+
+<span class="comment"># Create sequences</span>
+<span class="keyword">sequences</span> = []
+<span class="keyword">labels</span> = []
+<span class="keyword">look_back</span> = 14
+
+<span class="keyword">for</span> flock_id <span class="keyword">in</span> df[<span class="string">'flock_id'</span>].unique():
+    <span class="keyword">flock_df</span> = df[df[<span class="string">'flock_id'</span>]== flock_id].copy()
+    
+    <span class="keyword">if</span> len(flock_df) > look_back:
+        <span class="keyword">for</span> i <span class="keyword">in</span> range(len(flock_df) - look_back):
+            <span class="keyword">seq_x</span> = flock_df[features].iloc[i:i + look_back].values
+            <span class="keyword">seq_y</span> = flock_df[target].iloc[i + look_back]
+            sequences.append(seq_x)
+            labels.append(seq_y)</pre>
+            </div>
+        </section>
+
+        <section class="tech-stack animate">
+            <h2>Technology Stack</h2>
+            <div class="tech-list">
+                <div class="tech-item">Python</div>
+                <div class="tech-item">TensorFlow</div>
+                <div class="tech-item">Keras</div>
+                <div class="tech-item">Pandas</div>
+                <div class="tech-item">NumPy</div>
+                <div class="tech-item">scikit-learn</div>
+                <div class="tech-item">Jupyter</div>
+                <div class="tech-item">Power BI</div>
+                <div class="tech-item">Joblib</div>
+            </div>
+        </section>
+
+        <section class="animate">
+            <h2>Model Performance</h2>
+            <p>The trained model achieves excellent performance on the test set:</p>
+            <div class="code-block">
+                <button class="copy-btn">Copy Code</button>
+                <pre>Test Loss: 0.0741
+Test Accuracy: 98.6111%</pre>
+            </div>
+            
+            <h3>Sample Predictions</h3>
+            <div class="code-block">
+                <button class="copy-btn">Copy Code</button>
+                <pre>Actual: 0, Predicted Probability: 0.0096, Predicted Class: 0
+Actual: 0, Predicted Probability: 0.0115, Predicted Class: 0
+Actual: 0, Predicted Probability: 0.0100, Predicted Class: 0
+Actual: 0, Predicted Probability: 0.0089, Predicted Class: 0
+Actual: 0, Predicted Probability: 0.0090, Predicted Class: 0</pre>
+            </div>
+        </section>
+    </div>
+
+    <footer class="animate delay-3">
+        <div class="container">
+            <p>Frosty-8 Poultry & Dairy Analytics Project</p>
+            <p>© 2024 All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Copy button functionality
+            const copyButtons = document.querySelectorAll('.copy-btn');
+            
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.parentElement;
+                    const code = codeBlock.querySelector('pre').textContent;
+                    
+                    navigator.clipboard.writeText(code).then(() => {
+                        this.textContent = 'Copied!';
+                        this.classList.add('copied');
+                        
+                        setTimeout(() => {
+                            this.textContent = 'Copy Code';
+                            this.classList.remove('copied');
+                        }, 2000);
+                    });
+                });
+            });
+
+            // Intersection Observer for animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('animate');
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
 </body>
 </html>
