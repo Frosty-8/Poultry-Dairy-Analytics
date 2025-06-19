@@ -1,0 +1,19 @@
+[project]
+name = "farm-project"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "faker>=37.4.0",
+    "matplotlib>=3.10.3",
+    "numpy>=2.1.0",
+    "pandas>=2.3.0",
+    "scikit-learn>=1.7.0",
+    "tensorflow==2.19.0rc0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
