@@ -83,6 +83,27 @@
             margin: 0 auto;
         }
 
+        .pdf-viewer-btn {
+            display: inline-block;
+            margin-top: 1.5rem;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border: none;
+            cursor: pointer;
+        }
+
+        .pdf-viewer-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+            background: linear-gradient(90deg, #6d28d9, #0d9488);
+        }
+
         .project-info {
             background-color: var(--card-bg);
             border-radius: 10px;
@@ -300,6 +321,7 @@
         <div class="container">
             <h1>Frosty-8 Poultry & Dairy Analytics</h1>
             <p class="subtitle">A comprehensive analytics solution for poultry health monitoring and dairy farm management using machine learning</p>
+            <a href="pdf-viewer.html" class="pdf-viewer-btn">View Dairy Farm PDF Reports</a>
         </div>
     </header>
 
